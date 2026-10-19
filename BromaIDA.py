@@ -75,10 +75,14 @@ def on_import(form: MainForm, code: int = 0):
 
     bromas_dir = str(dir_form.saved_controls.iDir)
 
+    # Use classic std for Android platforms (GD 2.209+ no longer uses gnustl)
+    use_gnustl = not platform.startswith("android")
+
     broma_importer = BromaImporter(
         platform,
         Path(__file__).resolve().parent / "broma_ida" / "types",
-        Path(bromas_dir)
+        Path(bromas_dir),
+        use_gnustl=use_gnustl
     )
     broma_importer.parse_bromas()
     broma_importer.import_into_idb()

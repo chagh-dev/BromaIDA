@@ -883,7 +883,7 @@ class BromaImporter:
             DIRTREE_LOCAL_TYPES, "/BromaIDA", self._imported_types
         )
 
-    def __init__(self, platform: BROMA_PLATFORMS, hdrpath: Path, bpath: Path):
+    def __init__(self, platform: BROMA_PLATFORMS, hdrpath: Path, bpath: Path, use_gnustl: bool = False):
         """
         Initializes a BromaImporter instance.
 
@@ -893,11 +893,22 @@ class BromaImporter:
                 where the headers are stored.
             bpath (pathlib.Path): The folder path with the relevant
                 Broma binding files.
+            use_gnustl (bool): Whether to use gnustl for Android platforms.
+                Defaults to True for backward compatibility. Set to False for
+                Geometry Dash 2.209 Android which uses classic std.
         """
         self._reset()
         self._target_platform = platform
         self._headers_path = hdrpath
         self._bromas_path = bpath
+        self._use_gnustl = use_gnustl
+
+        # Compute STL platform name based on platform and use_gnustl flag
+        # For Android, if use_gnustl is False, use "windows" style STL
+        if platform in ("android32", "android64") and not use_gnustl:
+            self._stl_platform_name = "windows"
+        else:
+            self._stl_platform_name = BIUtils._plat_to_stl_name[platform]
 
         self._preload_broma_files()
         self._load_broma_classes()
@@ -1050,7 +1061,7 @@ class BromaImporter:
             )
 
         set_c_header_path(
-            BIUtils.get_stl_headers_path(self._target_platform, self._headers_path)
+            str(self._headers_path / "c++stl" / self._stl_platform_name)
         )
 
         with WaitBox("Importing types..."):
