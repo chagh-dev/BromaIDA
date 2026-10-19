@@ -904,9 +904,9 @@ class BromaImporter:
         self._use_gnustl = use_gnustl
 
         # Compute STL platform name based on platform and use_gnustl flag
-        # For Android, if use_gnustl is False, use "windows" style STL
+        # For Android, if use_gnustl is False, use "macho" style STL (similar to macOS ABI)
         if platform in ("android32", "android64") and not use_gnustl:
-            self._stl_platform_name = "windows"
+            self._stl_platform_name = "macho"
         else:
             self._stl_platform_name = BIUtils._plat_to_stl_name[platform]
 
