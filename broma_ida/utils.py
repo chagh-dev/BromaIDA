@@ -215,7 +215,7 @@ class STLUtils:
             stl_t = stl_t[:-len(" const")].rstrip()
 
         stripped = CppUtils.strip_crp(stl_t)
-        if "std::" not in stl_t or stripped == "std::string":
+        if "std::" not in stl_t or "<" not in stl_t or stripped == "std::string":
             return STLNode(const, stripped, ptr=ptr)
 
         # find the outermost template bracket
@@ -264,8 +264,13 @@ class STLUtils:
             if node.name == "std::string":
                 return f"{node.const} {STLUtils.STL_EXPANSION_MAP['std::string']}{node.ptr}".lstrip()
 
-            template = STLUtils.STL_EXPANSION_MAP[node.name]
             expanded_args = [expand_node(arg) for arg in node.args]
+
+            template = STLUtils.STL_EXPANSION_MAP[node.name]
+            if template is None:
+                # no known default template arguments, keep it as written
+                args = f"<{', '.join(expanded_args)}>" if expanded_args else ""
+                return f"{node.const} {node.name}{args}{node.ptr}".lstrip()
 
             return f"{node.const} {template.format(*expanded_args)}{node.ptr}".lstrip()
 
