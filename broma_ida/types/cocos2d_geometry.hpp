@@ -51,6 +51,8 @@ namespace cocos2d
 
 	static const ccColor3B ccWHITE = { 255, 255, 255} ;
 	#define CCPointZero CCPointMake(0, 0)
+	#define CCSizeZero CCSizeMake(0, 0)
+	#define CCRectZero CCRectMake(0, 0, 0, 0)
 
 	#define CCPointMake(x, y) cocos2d::CCPoint((float)(x), (float)(y))
 	#define CCSizeMake(width, height) cocos2d::CCSize((float)(width), (float)(height))

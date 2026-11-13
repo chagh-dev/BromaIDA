@@ -60,5 +60,13 @@ namespace std
 		// typedef __wrap_iter<const_pointer>               const_iterator;
 		// typedef _VSTD::reverse_iterator<iterator>         reverse_iterator;
 		// typedef _VSTD::reverse_iterator<const_iterator>   const_reverse_iterator;
+
+		// Layout-only stub, but the pre-made cocos2d header contains inline
+		// bodies that use a small subset of the vector API, so declare those
+		// here (member functions do not affect the layout).
+		template <class _Iter>
+		void assign(_Iter, _Iter);
+		reference front();
+		size_type size() const;
 	};
 }

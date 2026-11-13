@@ -1,0 +1,16 @@
+#pragma once
+
+#include "allocator"
+
+namespace std
+{
+	// Layout-only libc++/libstdc++ std::list stub (two node pointers + size).
+	template <class _Tp, class _Alloc = allocator<_Tp>>
+	class list
+	{
+	protected:
+		void* _Myprev;
+		void* _Mynext;
+		size_t _Mysize;
+	};
+}

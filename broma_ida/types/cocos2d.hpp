@@ -1197,14 +1197,14 @@ namespace cocos2d
 		unsigned int    atlasIndex;
 
 		//! Mode A: gravity, direction, radial accel, tangential accel
-		struct {
+		struct ModeA {
 			CCPoint        dir;
 			float        radialAccel;
 			float        tangentialAccel;
 		} modeA;
 
 		//! Mode B: radius mode
-		struct {
+		struct ModeB {
 			float        angle;
 			float        degreesPerSecond;
 			float        radius;
@@ -1452,6 +1452,21 @@ namespace cocos2d
 		}
 
 		friend class CCAutoreleasePool;
+	};
+
+	// Added in GD 2.209. Layouts taken from Geode's cocos2d headers.
+	class CCTouchClipper
+	{
+	public:
+		virtual ~CCTouchClipper() {}
+		virtual bool touchInsideClip(CCPoint const&) = 0;
+	};
+
+	class CCKeyboardActionManager : public CCObject
+	{
+	public:
+		virtual std::vector<int> actionsForKey(int key, bool ctrl, bool alt, bool shift) = 0;
+		virtual bool handleGlobalAction(int, bool);
 	};
 
 	class CCBool : public CCObject
@@ -4195,7 +4210,7 @@ namespace cocos2d
 
 		// Different modes
 		//! Mode A:Gravity + Tangential Accel + Radial Accel
-		struct {
+		struct ModeA {
 			/** Gravity value. Only available in 'Gravity' mode. */
 			CCPoint gravity;
 			/** speed of each particle. Only available in 'Gravity' mode.  */
@@ -4215,7 +4230,7 @@ namespace cocos2d
 		} modeA;
 
 		//! Mode B: circular movement (gravity, radial accel and tangential accel don't are not used in this mode)
-		struct {
+		struct ModeB {
 			/** The starting radius of the particles. Only available in 'Radius' mode. */
 			float startRadius;
 			/** The starting radius variance of the particles. Only available in 'Radius' mode. */
@@ -5081,15 +5096,18 @@ namespace cocos2d
 
 	static inline unsigned int getHashCodeByString(const char *key)
 	{
-		unsigned int len = strlen(key);
-		const char *end=key+len;
-		unsigned int hash;
+		unsigned int hash = 0;
 
-		for (hash = 0; key < end; key++)
+		for (; *key; key++)
 		{
+			unsigned char c = (unsigned char)*key;
+			if (c >= 'a' && c <= 'z')
+				c -= ('a' - 'A');
+
 			hash *= 16777619;
-			hash ^= (unsigned int)(unsigned char)std::toupper(*key);
+			hash ^= (unsigned int)c;
 		}
+
 		return (hash);
 	}
 

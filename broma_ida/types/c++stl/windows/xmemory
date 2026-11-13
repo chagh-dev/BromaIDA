@@ -3,6 +3,7 @@
 #include "cstddef"
 #include "utility"
 #include "__allocator_traits"
+#include "__pointer_traits"
 
 namespace std
 {
@@ -28,7 +29,7 @@ namespace std
 	template <class _Value_type, class _Voidptr>
 	struct _List_node { // list node
 		using value_type = _Value_type;
-		using _Nodeptr   = std::allocator_traits<_Voidptr>::template rebind_alloc<_List_node>;
+		using _Nodeptr   = typename pointer_traits<_Voidptr>::template rebind<_List_node>;
 		_Nodeptr _Next; // successor node, or first element if head
 		_Nodeptr _Prev; // predecessor node, or last element if head
 		_Value_type _Myval = // the stored value, unused if head

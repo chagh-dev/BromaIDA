@@ -71,11 +71,15 @@ class ClassGraph:
         # normalized_type -> [(stripped_leaf_type, is_by_value, is_from_function), ...]
         type_refs: dict[str, list[tuple[str, bool, bool]]] = field(default_factory=dict)
 
-    def __init__(self, classes: dict[str, Class]):
+    def __init__(self, classes: dict[str, Class], skipped_classes: set[str] | None = None):
         self._classes = classes
         self._info = {}
         self._namespace_prefixes = set()
         self.class_order = []
+        # Class names from the Broma files that are not present on the current
+        # platform (missing attribute). They are not emitted, but other classes
+        # can still reference them by pointer, so they may need a forward decl.
+        self._skipped_classes = skipped_classes or set()
 
         for name, cls in classes.items():
             if "::" in name:
@@ -268,9 +272,14 @@ class ClassGraph:
                 for bare, by_value, from_func in entries:
                     if (
                         (by_value and not from_func)
-                        or bare not in self._classes
                         or bare in self._namespace_prefixes
                     ):
+                        continue
+
+                    if bare not in self._classes:
+                        if bare in self._skipped_classes and bare not in seen:
+                            seen.add(bare)
+                            fwd_needed.append(bare)
                         continue
 
                     bare_pos = position.get(bare)

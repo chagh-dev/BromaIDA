@@ -36,6 +36,14 @@ namespace std
 		typedef typename __alloc_traits::pointer                pointer;
 		typedef typename __alloc_traits::const_pointer          const_pointer;
 
+		// Layout-only stub, but the pre-made cocos2d header contains inline
+		// bodies that use a small subset of the vector API, so declare those
+		// here (member functions do not affect the layout).
+		template <class _Iter>
+		void assign(_Iter, _Iter);
+		reference front();
+		size_type size() const;
+
 	protected:
 		_Tp* m_start;
 		_Tp* m_finish;

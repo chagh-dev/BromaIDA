@@ -110,11 +110,14 @@ class VerifyUtils:
             return False
 
         for member, stlmember in zip(udt, stub.members):
+            # IDA prints imported class types with an elaborated-type keyword
+            # ("struct std::vector<...>"), which is not part of the type and
+            # must be stripped before comparing against the expected type.
             ida_str = CppUtils.to_ida_equivalent(
-                CppUtils.normalize_type(str(member.type))
+                CppUtils.clean_demangled_type(str(member.type))
             )
             expected_str = CppUtils.to_ida_equivalent(
-                CppUtils.normalize_type(stlmember.type)
+                CppUtils.clean_demangled_type(stlmember.type)
             )
 
             ida_node = STLUtils.collapse_stl_type(
@@ -582,6 +585,7 @@ class BromaImporter:
     bindings: deque[Binding] = deque()
     linked_bindings: list[Binding]
     classes: dict[str, Class] = {}
+    skipped_classes: set[str] = set()
     duplicates: dict[int, list[Binding]] = {}
 
     # TODO: this and the is_function_present method should just find their own way
@@ -728,6 +732,7 @@ class BromaImporter:
         for _, root in self._broma_files.items():
             for cls in root.classes:
                 if self._target_platform in cls.attrs.missing:
+                    self.skipped_classes.add(cls.name)
                     continue
 
                 if cls.name in self.classes:
@@ -912,7 +917,7 @@ class BromaImporter:
 
         self._preload_broma_files()
         self._load_broma_classes()
-        self._graph = ClassGraph(self.classes)
+        self._graph = ClassGraph(self.classes, self.skipped_classes)
         self._codegen = BromaCodegen(
             self._target_platform,
             self.classes,
@@ -1338,4 +1343,5 @@ class BromaImporter:
         self.bindings = deque()
         self.linked_bindings = []
         self.classes = {}
+        self.skipped_classes = set()
         self.duplicates = {}

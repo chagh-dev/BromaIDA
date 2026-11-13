@@ -48,6 +48,15 @@ namespace std
 		// typedef std::reverse_iterator<iterator>              reverse_iterator;
 		// typedef std::reverse_iterator<const_iterator>        const_reverse_iterator;
 
+		// Layout-only stub, but the pre-made cocos2d header contains inline
+		// bodies that use a small subset of the string API, so declare those
+		// here (member functions do not affect the layout).
+		basic_string() = default;
+		basic_string(const _CharT*);
+		basic_string& operator=(const _CharT*);
+		const _CharT* c_str() const;
+		size_type size() const;
+
 	private:
 		stl::StringData<_CharT> m_data;
 	};
