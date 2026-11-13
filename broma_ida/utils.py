@@ -266,7 +266,7 @@ class STLUtils:
 
             expanded_args = [expand_node(arg) for arg in node.args]
 
-            template = STLUtils.STL_EXPANSION_MAP[node.name]
+            template = STLUtils.STL_EXPANSION_MAP.get(node.name)
             if template is None:
                 # no known default template arguments, keep it as written
                 args = f"<{', '.join(expanded_args)}>" if expanded_args else ""
