@@ -2325,6 +2325,8 @@ namespace cocos2d
 		virtual float getPositionX(void);
 		virtual void  setPositionY(float y);
 		virtual float getPositionY(void);
+		virtual void offsetPosition(float, float);
+		virtual void applyScale(float);
 
 		virtual void setSkewX(float fSkewX);
 		virtual float getSkewX();
